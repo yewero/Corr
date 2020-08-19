@@ -42,3 +42,26 @@ Corr <- function(expr_in, ncpu = 1) {
 # rownames(expr_test) <- paste0("C", 1:nrow(expr_test))
 # 
 # cor_res <- Corr(expr_in = expr_test, ncpu = 5)
+
+Corr_quick <- function(expr_in, ncpu = 1) {
+  nCell <- nrow(expr_in)
+  nGene <- ncol(expr_in)
+
+  cat("> Calculate comparison matrix...\n")
+  cl <- makeCluster(ncpu, type = "SOCK")
+  u_MT <- parSapply(cl, 1:nCell, function(i) {
+    cat(">", i, "/", nCell, "\n")
+    avgOther <- colMeans(expr_in[- i, ])
+    u <- rep(0, nGene)
+    u[expr_in[i, ] > avgOther] <- 1
+    u[expr_in[i, ] < avgOther] <- -1
+    return(u)
+  })
+  stopCluster(cl); rm(cl)
+  rownames(u_MT) <- colnames(expr_in)
+  colnames(u_MT) <- rownames(expr_in)
+
+  cat("> Calculate correlation...\n")
+  corMat <- cor(u_MT, method = "pearson")
+  return(corMat)
+}
