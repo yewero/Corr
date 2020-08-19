@@ -5,7 +5,7 @@ For convenience, the codes were rewritten using R.
 
 ## Usage
 ### Input:
-`expr_mat`, a expression matrix (row: cell; column: gene).
+`expr_mat`, an expression matrix (row: cell; column: gene).
 ### Correlation calculation:
 `source("Corr.r")`  
 `corMatrix <- Corr(expr_mat, ncpu = 2)` # For small dataset  
